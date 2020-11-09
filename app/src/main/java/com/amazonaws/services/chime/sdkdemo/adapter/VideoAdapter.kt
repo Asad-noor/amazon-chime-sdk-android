@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoFacade
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.DefaultVideoRenderView
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoPauseState
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoScalingType
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.CameraCaptureSource
 import com.amazonaws.services.chime.sdk.meetings.device.MediaDeviceType
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
@@ -46,11 +48,17 @@ class VideoAdapter(
         holder.bindVideoTile(videoCollectionTile)
         context?.let {
             val displayMetrics = context.resources.displayMetrics
-            val width =
-                if (isLandscapeMode(context) == true) displayMetrics.widthPixels / 2 else displayMetrics.widthPixels
-            val height = (width * VIDEO_ASPECT_RATIO_16_9).toInt()
-            holder.tileContainer.layoutParams.height = height
-            holder.tileContainer.layoutParams.width = width
+
+            if (videoCollectionTile.videoTileState.isContent) {
+                val videoRenderView = holder.tileContainer.findViewById(R.id.video_surface) as DefaultVideoRenderView
+                videoRenderView.scalingType = VideoScalingType.AspectFit
+            } else {
+                val width =
+                    if (isLandscapeMode(context) == true) displayMetrics.widthPixels / 2 else displayMetrics.widthPixels
+                val height = (width * VIDEO_ASPECT_RATIO_16_9).toInt()
+                holder.tileContainer.layoutParams.height = height
+                holder.tileContainer.layoutParams.width = width
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFact
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglVideoRenderView
 import com.amazonaws.services.chime.sdk.meetings.internal.utils.ObserverUtils
 import com.amazonaws.services.chime.sdk.meetings.internal.video.VideoClientController
+import com.amazonaws.services.chime.sdk.meetings.utils.DefaultModality
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 
 class DefaultVideoTileController(
@@ -193,12 +194,12 @@ class DefaultVideoTileController(
     }
 
     private fun onAddVideoTile(tileId: Int, attendeeId: String?, pauseState: VideoPauseState, videoStreamContentWidth: Int, videoStreamContentHeight: Int) {
-        var isLocalTile: Boolean
-        var thisAttendeeId: String
+        val isLocalTile: Boolean
+        val thisAttendeeId: String
 
         if (attendeeId != null) {
+            isLocalTile = (DefaultModality(attendeeId).base() == videoClientController.getConfiguration().credentials.attendeeId)
             thisAttendeeId = attendeeId
-            isLocalTile = false
         } else {
             thisAttendeeId = videoClientController.getConfiguration().credentials.attendeeId
             isLocalTile = true

@@ -12,6 +12,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.DefaultEglC
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFactory
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSession
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionCredentials
+import com.amazonaws.services.chime.sdkdemo.data.ScreenShareSource
 import com.amazonaws.services.chime.sdkdemo.utils.CpuVideoProcessor
 import com.amazonaws.services.chime.sdkdemo.utils.GpuVideoProcessor
 
@@ -33,4 +34,5 @@ class MeetingSessionModel : ViewModel() {
     lateinit var cameraCaptureSource: CameraCaptureSource
     lateinit var gpuVideoProcessor: GpuVideoProcessor
     lateinit var cpuVideoProcessor: CpuVideoProcessor
+    var screenShareSource: ScreenShareSource? = null
 }

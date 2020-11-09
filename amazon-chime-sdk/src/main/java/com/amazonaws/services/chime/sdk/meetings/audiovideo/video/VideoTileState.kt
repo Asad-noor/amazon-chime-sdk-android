@@ -5,6 +5,8 @@
 
 package com.amazonaws.services.chime.sdk.meetings.audiovideo.video
 
+import com.amazonaws.services.chime.sdk.meetings.utils.DefaultModality
+
 /**
  * Contains properties related to the current state of the [VideoTile]
  *
@@ -26,5 +28,5 @@ data class VideoTileState(
     /**
      * Whether the video tile is from screen share
      */
-    val isContent: Boolean = attendeeId.endsWith("#content")
+    val isContent: Boolean = DefaultModality(attendeeId).hasModality(DefaultModality.MODALITY_CONTENT)
 }

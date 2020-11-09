@@ -19,6 +19,11 @@ import com.xodee.client.video.VideoClientLogListener
 interface VideoClientObserver : VideoClientDelegate, VideoClientLogListener,
     VideoClientDataMessageListener {
     /**
+     * Indicates if TURN request is made successfully
+     */
+    fun isTURNSuccessful(): Boolean
+
+    /**
      * Subscribe to audio, video, and connection events with an [AudioVideoObserver].
      *
      * @param observer: [AudioVideoObserver] - The observer to subscribe to events with.

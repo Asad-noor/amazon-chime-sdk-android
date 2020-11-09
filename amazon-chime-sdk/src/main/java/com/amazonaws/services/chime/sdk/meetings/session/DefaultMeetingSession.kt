@@ -10,6 +10,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoFacade
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.DefaultAudioVideoController
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.DefaultAudioVideoFacade
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.audio.activespeakerdetector.DefaultActiveSpeakerDetector
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.DefaultContentShareController
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.DefaultVideoTileController
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.DefaultVideoTileFactory
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.DefaultEglCoreFactory
@@ -80,6 +81,8 @@ class DefaultMeetingSession(
                 configuration.urls.urlRewriter
             )
 
+        val videoClientFactory = DefaultVideoClientFactory()
+
         val videoClientController =
             DefaultVideoClientController(
                 context,
@@ -87,7 +90,7 @@ class DefaultMeetingSession(
                 videoClientStateController,
                 videoClientObserver,
                 configuration,
-                DefaultVideoClientFactory(),
+                videoClientFactory,
                 eglCoreFactory
             )
 
@@ -129,13 +132,50 @@ class DefaultMeetingSession(
                 videoClientObserver
             )
 
+        val contentShareConfiguration =
+            DefaultContentShareController.createContentShareMeetingSessionConfiguration(configuration)
+
+        val contentShareTurnRequestParams =
+            TURNRequestParams(
+                contentShareConfiguration.meetingId,
+                contentShareConfiguration.urls.signalingURL,
+                contentShareConfiguration.urls.turnControlURL,
+                contentShareConfiguration.credentials.joinToken
+            )
+
+        val contentShareVideoClientStateController =
+            DefaultVideoClientStateController(
+                logger
+            )
+
+        val contentShareObserver =
+            DefaultVideoClientObserver(
+                logger,
+                contentShareTurnRequestParams,
+                metricsCollector,
+                contentShareVideoClientStateController,
+                contentShareConfiguration.urls.urlRewriter
+            )
+
+        val contentShareController =
+            DefaultContentShareController(
+                context,
+                logger,
+                contentShareVideoClientStateController,
+                contentShareObserver,
+                contentShareConfiguration,
+                videoClientFactory,
+                eglCoreFactory
+            )
+
         audioVideo = DefaultAudioVideoFacade(
             context,
             audioVideoController,
             realtimeController,
             deviceController,
             videoTileController,
-            activeSpeakerDetector
+            activeSpeakerDetector,
+            contentShareController
         )
     }
 }

@@ -5,11 +5,13 @@
 
 package com.amazonaws.services.chime.sdkdemo.model
 
+import android.media.projection.MediaProjection
 import androidx.lifecycle.ViewModel
 import com.amazonaws.services.chime.sdk.meetings.device.MediaDevice
 import com.amazonaws.services.chime.sdkdemo.data.Message
 import com.amazonaws.services.chime.sdkdemo.data.MetricData
 import com.amazonaws.services.chime.sdkdemo.data.RosterAttendee
+import com.amazonaws.services.chime.sdkdemo.data.ScreenShareSource
 import com.amazonaws.services.chime.sdkdemo.data.VideoCollectionTile
 
 // This will be used for keeping state after rotation
@@ -26,10 +28,14 @@ class MeetingModel : ViewModel() {
     var isCameraOn = false
     var isDeviceListDialogOn = false
     var isAdditionalOptionsDialogOn = false
+    var isContentSharing = false
     var lastReceivedMessageTimestamp = 0L
     var tabIndex = 0
     var isUsingCameraCaptureSource = true
     var isLocalVideoStarted = false
     var isUsingGpuVideoProcessor = false
     var isUsingCpuVideoProcessor = false
+
+    var screenShareSource: ScreenShareSource? = null
+    var mediaProjection: MediaProjection? = null
 }

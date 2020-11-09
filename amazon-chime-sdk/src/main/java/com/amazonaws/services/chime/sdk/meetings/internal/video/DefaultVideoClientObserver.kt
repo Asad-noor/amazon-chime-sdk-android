@@ -20,6 +20,7 @@ import com.amazonaws.services.chime.sdk.meetings.realtime.datamessage.DataMessag
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatus
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatusCode
 import com.amazonaws.services.chime.sdk.meetings.session.URLRewriter
+import com.amazonaws.services.chime.sdk.meetings.utils.DefaultModality
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 import com.xodee.client.audio.audioclient.AudioClient
 import com.xodee.client.video.DataMessage as mediaDataMessage
@@ -61,8 +62,14 @@ class DefaultVideoClientObserver(
     private var videoClientTileObservers = mutableSetOf<VideoTileController>()
     private var dataMessageObserversByTopic = mutableMapOf<String, MutableSet<DataMessageObserver>>()
 
-    private val uiScope = CoroutineScope(Dispatchers.Main)
+    private val defaultScope = CoroutineScope(Dispatchers.Default)
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+
+    private var isTURNSuccessful: Boolean = false
+
+    override fun isTURNSuccessful(): Boolean {
+        return isTURNSuccessful
+    }
 
     override fun isConnecting(client: VideoClient?) {
         logger.info(TAG, "isConnecting")
@@ -105,6 +112,7 @@ class DefaultVideoClientObserver(
     override fun didStop(client: VideoClient?) {
         logger.info(TAG, "didStop")
 
+        isTURNSuccessful = false
         videoClientStateController.updateState(VideoClientState.STOPPED)
         forEachVideoClientStateObserver { observer ->
             observer.onVideoSessionStopped(
@@ -201,7 +209,7 @@ class DefaultVideoClientObserver(
 
     override fun requestTurnCreds(client: VideoClient?) {
         logger.info(TAG, "requestTurnCreds")
-        uiScope.launch {
+        defaultScope.launch {
             val turnResponse: TURNCredentials? = doTurnRequest()
             with(turnResponse) {
                 val isActive = client?.isActive ?: false
@@ -228,6 +236,7 @@ class DefaultVideoClientObserver(
                     )
                 }
             }
+            isTURNSuccessful = true
         }
     }
 
@@ -244,7 +253,7 @@ class DefaultVideoClientObserver(
                     requestMethod = "POST"
                     doInput = true
                     doOutput = true
-                    addRequestProperty(TOKEN_HEADER, "$TOKEN_KEY=${turnRequestParams.joinToken}")
+                    addRequestProperty(TOKEN_HEADER, "$TOKEN_KEY=${DefaultModality(turnRequestParams.joinToken).base()}")
                     setRequestProperty(CONTENT_TYPE_HEADER, CONTENT_TYPE)
                     val user_agent = System.getProperty(SYSPROP_USER_AGENT)
                     logger.info(TAG, "User Agent while doing TURN request is $user_agent")

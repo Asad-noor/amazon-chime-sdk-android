@@ -24,9 +24,9 @@ import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.LogLevel
 import com.amazonaws.services.chime.sdkdemo.R
 import com.amazonaws.services.chime.sdkdemo.data.JoinMeetingResponse
+import com.amazonaws.services.chime.sdkdemo.data.ScreenShareSource
 import com.amazonaws.services.chime.sdkdemo.fragment.DeviceManagementFragment
 import com.amazonaws.services.chime.sdkdemo.fragment.MeetingFragment
-import com.amazonaws.services.chime.sdkdemo.model.MeetingModel
 import com.amazonaws.services.chime.sdkdemo.model.MeetingSessionModel
 import com.amazonaws.services.chime.sdkdemo.utils.CpuVideoProcessor
 import com.amazonaws.services.chime.sdkdemo.utils.GpuVideoProcessor
@@ -39,7 +39,6 @@ class MeetingActivity : AppCompatActivity(),
     private val logger = ConsoleLogger(LogLevel.DEBUG)
     private val gson = Gson()
     private val meetingSessionModel: MeetingSessionModel by lazy { ViewModelProvider(this)[MeetingSessionModel::class.java] }
-    private val meetingModel: MeetingModel by lazy { ViewModelProvider(this)[MeetingModel::class.java] }
     private lateinit var meetingId: String
     private lateinit var name: String
     private var cachedDevice: MediaDevice? = null
@@ -112,10 +111,13 @@ class MeetingActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
+        meetingSessionModel.audioVideo.stopContentShare()
         meetingSessionModel.audioVideo.stop()
         meetingSessionModel.cameraCaptureSource.stop()
         meetingSessionModel.gpuVideoProcessor.release()
         meetingSessionModel.cpuVideoProcessor.release()
+        meetingSessionModel.screenShareSource?.stop()
+        meetingSessionModel.screenShareSource?.release()
         super.onBackPressed()
     }
 
@@ -134,6 +136,10 @@ class MeetingActivity : AppCompatActivity(),
     fun getGpuVideoProcessor(): GpuVideoProcessor = meetingSessionModel.gpuVideoProcessor
 
     fun getCpuVideoProcessor(): CpuVideoProcessor = meetingSessionModel.cpuVideoProcessor
+
+    fun setScreenShareSource(screenShareSource: ScreenShareSource?) {
+        meetingSessionModel.screenShareSource = screenShareSource
+    }
 
     private fun urlRewriter(url: String): String {
         // You can change urls by url.replace("example.com", "my.example.com")
