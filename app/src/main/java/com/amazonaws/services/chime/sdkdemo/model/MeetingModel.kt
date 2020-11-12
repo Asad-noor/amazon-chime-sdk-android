@@ -16,7 +16,7 @@ import com.amazonaws.services.chime.sdkdemo.data.VideoCollectionTile
 class MeetingModel : ViewModel() {
     val currentMetrics = mutableMapOf<String, MetricData>()
     val currentRoster = mutableMapOf<String, RosterAttendee>()
-    val currentVideoTiles = mutableMapOf<Int, VideoCollectionTile>()
+    val currentVideoTiles = mutableListOf<VideoCollectionTile>()
     val currentScreenTiles = mutableMapOf<Int, VideoCollectionTile>()
     val nextVideoTiles = LinkedHashMap<Int, VideoCollectionTile>()
     var currentMediaDevices = listOf<MediaDevice>()

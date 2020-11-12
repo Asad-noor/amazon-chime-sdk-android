@@ -158,7 +158,7 @@ class DefaultVideoTileController(
     }
 
     override fun bindVideoView(videoView: VideoRenderView, tileId: Int) {
-        logger.info(TAG, "Binding VideoView to Tile with tileId = $tileId")
+        logger.info(TAG, "Binding VideoView to Tile with tileId = $tileId ${videoView.hashCode()}")
 
         boundVideoViewMap[videoView]?.let {
             logger.warn(TAG, "Override the binding from $it to $tileId")

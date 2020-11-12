@@ -30,7 +30,8 @@ class VideoAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         val inflatedView = parent.inflate(R.layout.item_video, false)
-        return VideoHolder(inflatedView, audioVideoFacade)
+        val holder = VideoHolder(inflatedView, audioVideoFacade)
+        return holder
     }
 
     override fun getItemCount(): Int {

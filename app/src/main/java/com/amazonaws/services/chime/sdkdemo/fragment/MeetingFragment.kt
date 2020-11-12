@@ -62,12 +62,12 @@ import com.amazonaws.services.chime.sdkdemo.data.VideoCollectionTile
 import com.amazonaws.services.chime.sdkdemo.model.MeetingModel
 import com.amazonaws.services.chime.sdkdemo.utils.isLandscapeMode
 import com.google.android.material.tabs.TabLayout
-import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.*
 
 class MeetingFragment : Fragment(),
     RealtimeObserver, AudioVideoObserver, VideoTileObserver,
@@ -106,6 +106,7 @@ class MeetingFragment : Fragment(),
         Screen(3),
         Metrics(4)
     }
+    private val timer = Timer()
 
     private lateinit var noVideoOrScreenShareAvailable: TextView
     private lateinit var editTextMessage: EditText
@@ -125,6 +126,7 @@ class MeetingFragment : Fragment(),
     private lateinit var screenTileAdapter: VideoAdapter
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var tabLayout: TabLayout
+
 
     companion object {
         fun newInstance(meetingId: String): MeetingFragment {
@@ -177,6 +179,21 @@ class MeetingFragment : Fragment(),
         subscribeToAttendeeChangeHandlers()
         audioVideo.start()
         audioVideo.startRemoteVideo()
+        timer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                if (meetingModel.currentVideoTiles.size > 3) {
+                   val list = meetingModel.currentVideoTiles
+                    val oldTile = list[0]
+                    val newTile = list[1]
+                    meetingModel.currentVideoTiles[0] = newTile
+                    meetingModel.currentVideoTiles[1] = oldTile
+                    uiScope.launch {
+                        videoTileAdapter.notifyItemChanged(0)
+                        videoTileAdapter.notifyItemChanged(1)
+                    }
+                }
+            }
+        }, 1000, 3000)
         return view
     }
 
@@ -209,7 +226,7 @@ class MeetingFragment : Fragment(),
             view.findViewById(R.id.recyclerViewVideoCollection)
         recyclerViewVideoCollection.layoutManager = createLinearLayoutManagerForOrientation()
         videoTileAdapter = VideoAdapter(
-            meetingModel.currentVideoTiles.values,
+            meetingModel.currentVideoTiles,
             audioVideo,
             context
         )
@@ -618,16 +635,18 @@ class MeetingFragment : Fragment(),
                 createVideoCollectionTile(tileState)
             screenTileAdapter.notifyDataSetChanged()
         } else {
-            meetingModel.currentVideoTiles[tileState.tileId] =
-                createVideoCollectionTile(tileState)
-            videoTileAdapter.notifyDataSetChanged()
+            if (!meetingModel.currentVideoTiles.map { it.videoTileState.tileId }.contains(tileState.tileId)) {
+                meetingModel.currentVideoTiles.add(
+                    createVideoCollectionTile(tileState))
+                videoTileAdapter.notifyDataSetChanged()
+            }
         }
     }
 
     private fun canShowMoreRemoteVideoTile(): Boolean {
         // Current max amount of tiles should preserve one spot for local video
         val currentMax =
-            if (meetingModel.currentVideoTiles.containsKey(LOCAL_TILE_ID)) MAX_TILE_COUNT else MAX_TILE_COUNT - 1
+            if (meetingModel.currentVideoTiles.map { it.videoTileState.tileId }.contains(LOCAL_TILE_ID)) MAX_TILE_COUNT else MAX_TILE_COUNT - 1
         return meetingModel.currentVideoTiles.size < currentMax
     }
 
@@ -744,7 +763,7 @@ class MeetingFragment : Fragment(),
                 // For local video, should show it anyway
                 if (tileState.isLocalTile) {
                     showVideoTile(tileState)
-                } else if (!meetingModel.currentVideoTiles.containsKey(tileState.tileId)) {
+                } else if (!meetingModel.currentVideoTiles.map { it.videoTileState.tileId }.contains(tileState.tileId)) {
                     if (canShowMoreRemoteVideoTile()) {
                         showVideoTile(tileState)
                     } else {
@@ -766,8 +785,9 @@ class MeetingFragment : Fragment(),
                 "Video track removed, titleId: $tileId, attendeeId: ${tileState.attendeeId}"
             )
             audioVideo.unbindVideoView(tileId)
-            if (meetingModel.currentVideoTiles.containsKey(tileId)) {
-                meetingModel.currentVideoTiles.remove(tileId)
+            if (meetingModel.currentVideoTiles.map{it.videoTileState.tileId}.contains(tileId)) {
+                val ind = meetingModel.currentVideoTiles.map{it.videoTileState.tileId}.indexOf(tileId)
+                meetingModel.currentVideoTiles.removeAt(ind)
                 // Show next video tileState if available
                 if (meetingModel.nextVideoTiles.isNotEmpty() && canShowMoreRemoteVideoTile()) {
                     val nextTileState: VideoTileState =
@@ -918,8 +938,8 @@ class MeetingFragment : Fragment(),
     override fun onDestroy() {
         super.onDestroy()
         unsubscribeFromAttendeeChangeHandlers()
-        meetingModel.currentVideoTiles.forEach { (tileId, _) ->
-            audioVideo.unbindVideoView(tileId)
-        }
+//        meetingModel.currentVideoTiles.forEach { (tileId, _) ->
+//            audioVideo.unbindVideoView(tileId)
+//        }
     }
 }
