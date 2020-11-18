@@ -137,6 +137,8 @@ class MeetingActivity : AppCompatActivity(),
 
     fun getCpuVideoProcessor(): CpuVideoProcessor = meetingSessionModel.cpuVideoProcessor
 
+    fun getScreenShareSource(): ScreenShareSource? = meetingSessionModel.screenShareSource
+
     fun setScreenShareSource(screenShareSource: ScreenShareSource?) {
         meetingSessionModel.screenShareSource = screenShareSource
     }

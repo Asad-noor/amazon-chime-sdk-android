@@ -62,14 +62,8 @@ class DefaultVideoClientObserver(
     private var videoClientTileObservers = mutableSetOf<VideoTileController>()
     private var dataMessageObserversByTopic = mutableMapOf<String, MutableSet<DataMessageObserver>>()
 
-    private val defaultScope = CoroutineScope(Dispatchers.Default)
+    private val uiScope = CoroutineScope(Dispatchers.Main)
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-
-    private var isTURNSuccessful: Boolean = false
-
-    override fun isTURNSuccessful(): Boolean {
-        return isTURNSuccessful
-    }
 
     override fun isConnecting(client: VideoClient?) {
         logger.info(TAG, "isConnecting")
@@ -112,7 +106,6 @@ class DefaultVideoClientObserver(
     override fun didStop(client: VideoClient?) {
         logger.info(TAG, "didStop")
 
-        isTURNSuccessful = false
         videoClientStateController.updateState(VideoClientState.STOPPED)
         forEachVideoClientStateObserver { observer ->
             observer.onVideoSessionStopped(
@@ -209,7 +202,7 @@ class DefaultVideoClientObserver(
 
     override fun requestTurnCreds(client: VideoClient?) {
         logger.info(TAG, "requestTurnCreds")
-        defaultScope.launch {
+        uiScope.launch {
             val turnResponse: TURNCredentials? = doTurnRequest()
             with(turnResponse) {
                 val isActive = client?.isActive ?: false
@@ -236,7 +229,6 @@ class DefaultVideoClientObserver(
                     )
                 }
             }
-            isTURNSuccessful = true
         }
     }
 

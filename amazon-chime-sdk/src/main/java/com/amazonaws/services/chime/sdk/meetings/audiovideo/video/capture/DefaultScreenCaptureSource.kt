@@ -30,6 +30,12 @@ class DefaultScreenCaptureSource(
 ) : VideoCaptureSource, VideoSink {
     private lateinit var displayMetrics: DisplayMetrics
     private var virtualDisplay: VirtualDisplay? = null
+
+    // This source provides a surface we pass into the system APIs
+    // and then starts emitting frames once the system starts drawing to the
+    // surface. To speed up restart, since theses sources have to wait on
+    // in-flight frames to finish release, we just begin the release and
+    // create a new one
     private var surfaceTextureSource: SurfaceTextureCaptureSource? = null
 
     private val handler: Handler
@@ -37,7 +43,7 @@ class DefaultScreenCaptureSource(
     private val observers = mutableSetOf<CaptureSourceObserver>()
     private val sinks = mutableSetOf<VideoSink>()
 
-    override val contentHint = VideoContentHint.Detail
+    override val contentHint = VideoContentHint.Text
 
     private val TAG = "DefaultScreenCaptureSource"
 
@@ -121,9 +127,7 @@ class DefaultScreenCaptureSource(
     }
 
     override fun onVideoFrameReceived(frame: VideoFrame) {
-        frame.buffer.retain()
         sinks.forEach { it.onVideoFrameReceived(frame) }
-        frame.release()
     }
 
     fun release() {

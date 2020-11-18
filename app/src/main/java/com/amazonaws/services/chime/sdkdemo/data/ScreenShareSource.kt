@@ -14,7 +14,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.Defaul
 import com.amazonaws.services.chime.sdkdemo.service.ScreenCaptureService
 
 class ScreenShareSource(
-    videoCaptureSource: DefaultScreenCaptureSource? = null,
+    videoCaptureSource: DefaultScreenCaptureSource,
     private val context: Context? = null
 ) : ContentShareSource() {
     override var videoSource: VideoSource? = videoCaptureSource

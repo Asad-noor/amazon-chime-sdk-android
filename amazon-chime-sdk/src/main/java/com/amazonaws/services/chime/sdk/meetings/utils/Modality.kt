@@ -6,14 +6,14 @@
 package com.amazonaws.services.chime.sdk.meetings.utils
 
 /**
- * The Modality type is a backwards-compatible extension of the
- * profile id (UUID string) and session token schemas (base 64 string).
- * It appends #<modality> to the string, which indicates the modality
+ * [Modality] is a backwards compatible extension of the
+ * attendee id (UUID string) and session token schemas (base 64 string).
+ * It appends #<modality> to either strings, which indicates the modality
  * of the participant.
  */
 interface Modality {
     /**
-     * The participant Id
+     * The Id
      */
     fun id(): String
 

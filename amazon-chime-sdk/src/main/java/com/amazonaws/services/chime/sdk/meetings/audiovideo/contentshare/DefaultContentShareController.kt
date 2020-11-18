@@ -22,7 +22,6 @@ import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatus
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatusCode
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 import com.xodee.client.video.VideoClient
-import com.xodee.client.video.VideoClientCapturer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,7 +44,6 @@ class DefaultContentShareController(
     private var eglCore: EglCore? = null
     private var isCurrentSharing = false
 
-    private val TURN_UPDATE_WAITING_MS = 1000L
     private val TAG = "DefaultContentShareController"
 
     private val VIDEO_CLIENT_FLAG_ENABLE_USE_HW_DECODE_AND_RENDER = 1 shl 6
@@ -82,17 +80,15 @@ class DefaultContentShareController(
                 stopContentShare()
             }
 
-            if (eglCore == null) {
-                eglCore = eglCoreFactory.createEglCore()
-            }
-
             // Start the given content share source
             source.videoSource?.let { videoSource ->
-                videoClientStateController.start()
 
-                while (!videoClientObserver.isTURNSuccessful()) {
-                    Thread.sleep(TURN_UPDATE_WAITING_MS)
+                if (eglCore == null) {
+                    logger.debug(TAG, "Creating EGL core")
+                    eglCore = eglCoreFactory.createEglCore()
                 }
+
+                videoClientStateController.start()
 
                 logger.info(TAG, "Setting external video source to content share source")
                 videoSourceAdapter.source = videoSource
@@ -111,7 +107,6 @@ class DefaultContentShareController(
         logger.info(TAG, "Initializing video client")
         initializeAppDetailedInfo()
         VideoClient.initializeGlobals(context)
-        VideoClientCapturer.getInstance(context)
         videoClient = videoClientFactory.getVideoClient(videoClientObserver)
     }
 

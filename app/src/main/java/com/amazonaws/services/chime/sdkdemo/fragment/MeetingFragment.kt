@@ -94,6 +94,7 @@ class MeetingFragment : Fragment(),
     private val meetingModel: MeetingModel by lazy { ViewModelProvider(this)[MeetingModel::class.java] }
 
     private var deviceDialog: AlertDialog? = null
+    private var screenShareSource: ScreenShareSource? = null
 
     private lateinit var mediaProjectionManager: MediaProjectionManager
     private lateinit var credentials: MeetingSessionCredentials
@@ -107,6 +108,7 @@ class MeetingFragment : Fragment(),
 
     private val MAX_TILE_COUNT = 16
     private val LOCAL_TILE_ID = 0
+    private val ACTIVE_SCREEN_TILE_KEY = 0
     private val WEBRTC_PERMISSION_REQUEST_CODE = 1
     private val SCREEN_CAPTURE_REQUEST_CODE = 2
     private val TAG = "MeetingFragment"
@@ -185,6 +187,7 @@ class MeetingFragment : Fragment(),
         cameraCaptureSource = activity.getCameraCaptureSource()
         gpuVideoProcessor = activity.getGpuVideoProcessor()
         cpuVideoProcessor = activity.getCpuVideoProcessor()
+        screenShareSource = activity.getScreenShareSource()
         audioDeviceManager = AudioDeviceManager(audioVideo)
 
         mediaProjectionManager = activity.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -833,8 +836,7 @@ class MeetingFragment : Fragment(),
                         context,
                         getString(R.string.user_notification_permission_error),
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    ).show()
                 } else {
                     startLocalVideo()
                 }
@@ -851,8 +853,7 @@ class MeetingFragment : Fragment(),
                     context,
                     getString(R.string.user_notification_screen_share_permission_error),
                     Toast.LENGTH_LONG
-                )
-                    .show()
+                ).show()
             } else {
                 data?.let { startScreenShare(resultCode, it) }
             }
@@ -862,12 +863,12 @@ class MeetingFragment : Fragment(),
     private fun startScreenShare(resultCode: Int, data: Intent) {
         context?.startService(Intent(context, ScreenCaptureService::class.java))
 
-        meetingModel.mediaProjection = mediaProjectionManager.getMediaProjection(
+        val mediaProjection = mediaProjectionManager.getMediaProjection(
             resultCode,
             data
         )
 
-        meetingModel.mediaProjection?.let {
+        mediaProjection?.let {
             val screenCaptureSource = DefaultScreenCaptureSource(
                 context!!,
                 logger,
@@ -880,7 +881,7 @@ class MeetingFragment : Fragment(),
 
             val screenCaptureSourceObserver = object : CaptureSourceObserver {
                 override fun onCaptureStarted() {
-                    meetingModel.screenShareSource?.let { source ->
+                    screenShareSource?.let { source ->
                         audioVideo.startContentShare(source) }
                 }
 
@@ -890,13 +891,14 @@ class MeetingFragment : Fragment(),
 
                 override fun onCaptureFailed(error: CaptureSourceError) {
                     notifyHandler("Screen capture failed with error $error")
+                    audioVideo.stopContentShare()
                 }
             }
 
-            meetingModel.screenShareSource = ScreenShareSource(screenCaptureSource, context)
-            meetingModel.screenShareSource?.addObserver(screenCaptureSourceObserver)
-            meetingModel.screenShareSource?.start()
-            (activity as MeetingActivity).setScreenShareSource(meetingModel.screenShareSource)
+            screenShareSource = ScreenShareSource(screenCaptureSource, context)
+            screenShareSource?.addObserver(screenCaptureSourceObserver)
+            screenShareSource?.start()
+            (activity as MeetingActivity).setScreenShareSource(screenShareSource)
         }
     }
 
@@ -915,12 +917,12 @@ class MeetingFragment : Fragment(),
             "$status"
         )
         meetingModel.isContentSharing = false
-        meetingModel.screenShareSource?.stop()
+        screenShareSource?.stop()
     }
 
     private fun showVideoTile(tileState: VideoTileState) {
         if (tileState.isContent) {
-            meetingModel.currentScreenTiles[0] =
+            meetingModel.currentScreenTiles[ACTIVE_SCREEN_TILE_KEY] =
                 createVideoCollectionTile(tileState)
             screenTileAdapter.notifyDataSetChanged()
         } else {
@@ -985,9 +987,6 @@ class MeetingFragment : Fragment(),
             object {}.javaClass.enclosingMethod?.name,
             "${sessionStatus.statusCode}"
         )
-        if (meetingModel.isContentSharing) {
-            audioVideo.stopContentShare()
-        }
 
         if (sessionStatus.statusCode != MeetingSessionStatusCode.OK) {
             listener.onLeaveMeeting()
@@ -1096,8 +1095,8 @@ class MeetingFragment : Fragment(),
                 videoTileAdapter.notifyDataSetChanged()
             } else if (meetingModel.nextVideoTiles.containsKey(tileId)) {
                 meetingModel.nextVideoTiles.remove(tileId)
-            } else if (meetingModel.currentScreenTiles[0]?.videoTileState?.tileId == tileId) {
-                meetingModel.currentScreenTiles.remove(0)
+            } else if (meetingModel.currentScreenTiles[ACTIVE_SCREEN_TILE_KEY]?.videoTileState?.tileId == tileId) {
+                meetingModel.currentScreenTiles.remove(ACTIVE_SCREEN_TILE_KEY)
                 screenTileAdapter.notifyDataSetChanged()
             }
             refreshNoVideosOrScreenShareAvailableText()
