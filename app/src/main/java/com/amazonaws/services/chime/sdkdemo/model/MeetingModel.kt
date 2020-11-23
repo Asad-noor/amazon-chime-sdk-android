@@ -26,7 +26,7 @@ class MeetingModel : ViewModel() {
     var isCameraOn = false
     var isDeviceListDialogOn = false
     var isAdditionalOptionsDialogOn = false
-    var isContentSharing = false
+    var isSharingContent = false
     var lastReceivedMessageTimestamp = 0L
     var tabIndex = 0
     var isUsingCameraCaptureSource = true

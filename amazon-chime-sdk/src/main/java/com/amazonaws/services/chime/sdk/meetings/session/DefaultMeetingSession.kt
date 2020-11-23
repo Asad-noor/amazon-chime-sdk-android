@@ -19,6 +19,8 @@ import com.amazonaws.services.chime.sdk.meetings.device.DefaultDeviceController
 import com.amazonaws.services.chime.sdk.meetings.internal.audio.AudioClientFactory
 import com.amazonaws.services.chime.sdk.meetings.internal.audio.DefaultAudioClientController
 import com.amazonaws.services.chime.sdk.meetings.internal.audio.DefaultAudioClientObserver
+import com.amazonaws.services.chime.sdk.meetings.internal.contentshare.DefaultContentShareVideoClientController
+import com.amazonaws.services.chime.sdk.meetings.internal.contentshare.DefaultContentShareVideoClientObserver
 import com.amazonaws.services.chime.sdk.meetings.internal.metric.DefaultClientMetricsCollector
 import com.amazonaws.services.chime.sdk.meetings.internal.video.DefaultVideoClientController
 import com.amazonaws.services.chime.sdk.meetings.internal.video.DefaultVideoClientFactory
@@ -143,29 +145,27 @@ class DefaultMeetingSession(
                 contentShareConfiguration.credentials.joinToken
             )
 
-        val contentShareVideoClientStateController =
-            DefaultVideoClientStateController(
-                logger
-            )
-
         val contentShareObserver =
-            DefaultVideoClientObserver(
+            DefaultContentShareVideoClientObserver(
                 logger,
                 contentShareTurnRequestParams,
-                metricsCollector,
-                contentShareVideoClientStateController,
                 contentShareConfiguration.urls.urlRewriter
             )
 
-        val contentShareController =
-            DefaultContentShareController(
+        val contentShareVideoClientController =
+            DefaultContentShareVideoClientController(
                 context,
                 logger,
-                contentShareVideoClientStateController,
                 contentShareObserver,
                 contentShareConfiguration,
                 videoClientFactory,
                 eglCoreFactory
+            )
+
+        val contentShareController =
+            DefaultContentShareController(
+                logger,
+                contentShareVideoClientController
             )
 
         audioVideo = DefaultAudioVideoFacade(

@@ -56,7 +56,7 @@
 
     <!-- Service -->
     <string name="screen_capture_notification_tile">Screen Sharing</string>
-    <string name="screen_capture_notification_text">Your screen is being sharing.</string>
+    <string name="screen_capture_notification_text">Your screen is being shared.</string>
 
     <!-- Notify users for errors -->
     <string name="user_notification_meeting_id_invalid">Meeting ID is invalid</string>

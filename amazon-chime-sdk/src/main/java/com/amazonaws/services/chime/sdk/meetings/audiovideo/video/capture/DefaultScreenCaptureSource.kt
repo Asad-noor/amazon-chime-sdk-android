@@ -30,6 +30,7 @@ class DefaultScreenCaptureSource(
 ) : VideoCaptureSource, VideoSink {
     private lateinit var displayMetrics: DisplayMetrics
     private var virtualDisplay: VirtualDisplay? = null
+    private var isCapturing = false
 
     // This source provides a surface we pass into the system APIs
     // and then starts emitting frames once the system starts drawing to the
@@ -54,6 +55,7 @@ class DefaultScreenCaptureSource(
     }
 
     override fun start() {
+        if (isCapturing) return
         logger.info(TAG, "Starting screen capture source")
 
         displayMetrics = context.resources.displayMetrics
@@ -82,6 +84,7 @@ class DefaultScreenCaptureSource(
                     ObserverUtils.notifyObserverOnMainThread(observers) {
                         it.onCaptureStopped()
                     }
+                    isCapturing = false
                 }
             },
             handler
@@ -91,9 +94,11 @@ class DefaultScreenCaptureSource(
         ObserverUtils.notifyObserverOnMainThread(observers) {
             it.onCaptureStarted()
         }
+        isCapturing = true
     }
 
     override fun stop() {
+        if (!isCapturing) return
         logger.info(TAG, "Stopping screen capture source")
         val sink: VideoSink = this
         runBlocking(handler.asCoroutineDispatcher().immediate) {

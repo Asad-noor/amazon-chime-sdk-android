@@ -13,9 +13,11 @@ package com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare
 interface ContentShareController {
     /**
      * Start sharing the content of a given [ContentShareSource].
+     *
      * Once sharing has started successfully, [ContentShareObserver.onContentShareStarted] will
      * be invoked. If sharing fails or stops, [ContentShareObserver.onContentShareStopped]
      * will be invoked with [ContentShareStatus] as the cause.
+     *
      * Calling this function repeatedly will replace the previous [ContentShareSource] as the one being
      * transmitted.
      *
@@ -25,6 +27,7 @@ interface ContentShareController {
 
     /**
      * Stop sharing the content of a [ContentShareSource] that previously started.
+     *
      * Once the sharing stops successfully, [ContentShareObserver.onContentShareStopped]
      * will be invoked with status code [ContentShareStatusCode.OK].
      */

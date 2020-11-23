@@ -20,7 +20,6 @@ import com.amazonaws.services.chime.sdk.meetings.realtime.datamessage.DataMessag
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatus
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatusCode
 import com.amazonaws.services.chime.sdk.meetings.session.URLRewriter
-import com.amazonaws.services.chime.sdk.meetings.utils.DefaultModality
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 import com.xodee.client.audio.audioclient.AudioClient
 import com.xodee.client.video.DataMessage as mediaDataMessage
@@ -245,7 +244,7 @@ class DefaultVideoClientObserver(
                     requestMethod = "POST"
                     doInput = true
                     doOutput = true
-                    addRequestProperty(TOKEN_HEADER, "$TOKEN_KEY=${DefaultModality(turnRequestParams.joinToken).base()}")
+                    addRequestProperty(TOKEN_HEADER, "$TOKEN_KEY=${turnRequestParams.joinToken}")
                     setRequestProperty(CONTENT_TYPE_HEADER, CONTENT_TYPE)
                     val user_agent = System.getProperty(SYSPROP_USER_AGENT)
                     logger.info(TAG, "User Agent while doing TURN request is $user_agent")

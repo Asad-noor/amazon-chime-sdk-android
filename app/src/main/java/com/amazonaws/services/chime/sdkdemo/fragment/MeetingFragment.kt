@@ -55,6 +55,7 @@ import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionCredentia
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatus
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionStatusCode
 import com.amazonaws.services.chime.sdk.meetings.utils.DefaultModality
+import com.amazonaws.services.chime.sdk.meetings.utils.ModalityType
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.LogLevel
 import com.amazonaws.services.chime.sdkdemo.R
@@ -603,7 +604,7 @@ class MeetingFragment : Fragment(),
     private fun getAttendeeName(attendeeId: String, externalUserId: String): String {
         val attendeeName = externalUserId.split('#')[1]
 
-        return if (DefaultModality(attendeeId).hasModality(DefaultModality.MODALITY_CONTENT)) {
+        return if (DefaultModality(attendeeId).hasModality(ModalityType.Content)) {
             "$attendeeName $CONTENT_NAME_SUFFIX"
         } else {
             attendeeName
@@ -761,7 +762,8 @@ class MeetingFragment : Fragment(),
     }
 
     private fun toggleScreenCapture() {
-        if (meetingModel.isContentSharing) {
+        logger.info("linsang", "isSharing: ${meetingModel.isSharingContent}")
+        if (meetingModel.isSharingContent) {
             audioVideo.stopContentShare()
         } else {
             startActivityForResult(
@@ -907,7 +909,7 @@ class MeetingFragment : Fragment(),
         logWithFunctionName(
             object {}.javaClass.enclosingMethod?.name
         )
-        meetingModel.isContentSharing = true
+        meetingModel.isSharingContent = true
     }
 
     override fun onContentShareStopped(status: ContentShareStatus) {
@@ -916,7 +918,7 @@ class MeetingFragment : Fragment(),
             object {}.javaClass.enclosingMethod?.name,
             "$status"
         )
-        meetingModel.isContentSharing = false
+        meetingModel.isSharingContent = false
         screenShareSource?.stop()
     }
 
@@ -1051,7 +1053,7 @@ class MeetingFragment : Fragment(),
             )
             if (tileState.isContent) {
                 // Show the latest content share
-                if (meetingModel.isContentSharing && !tileState.isLocalTile) {
+                if (meetingModel.isSharingContent && !tileState.isLocalTile) {
                     audioVideo.stopContentShare()
                     notifyHandler("${meetingModel.currentRoster[tileState.attendeeId]?.attendeeName ?: ""} took over the screen share")
                 }

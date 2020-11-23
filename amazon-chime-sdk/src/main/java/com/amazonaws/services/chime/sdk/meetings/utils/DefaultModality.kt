@@ -5,33 +5,57 @@
 
 package com.amazonaws.services.chime.sdk.meetings.utils
 
-class DefaultModality(private val id: String) : Modality {
+/**
+ * [DefaultModality] is a backwards compatible extension of the
+ * attendee id (UUID string) and session token schemas (base 64 string).
+ * It appends #<modality> to either strings, which indicates the modality
+ * of the participant.
+ *
+ * For example,
+ * attendeeId: "abcdefg"
+ * contentAttendeeId: "abcdefg#content"
+ * base(contentAttendeeId): "abcdefg"
+ * modality(contentAttendeeId): "content"
+ * hasModality(contentAttendeeId): true
+ */
+class DefaultModality(private val id: String) {
 
     companion object {
         const val MODALITY_SEPARATOR = "#"
-        const val MODALITY_CONTENT = "content"
     }
 
-    override fun id(): String {
+    /**
+     * The Id
+     */
+    fun id(): String {
         return id
     }
 
-    override fun base(): String {
+    /**
+     * The base of the Id
+     */
+    fun base(): String {
         if (id.isEmpty()) {
             return ""
         }
         return id.split(MODALITY_SEPARATOR)[0]
     }
 
-    override fun modality(): String {
+    /**
+     * The modality of the Id
+     */
+    fun modality(): ModalityType? {
         if (id.isEmpty()) {
-            return ""
+            return null
         }
         val components = id.split(MODALITY_SEPARATOR)
-        return if (components.size == 2) components[1] else ""
+        return if (components.size == 2) ModalityType.fromValue(components[1]) else null
     }
 
-    override fun hasModality(modality: String): Boolean {
-        return modality.isNotEmpty() && modality() == modality
+    /**
+     * Check whether the current Id contains the input modality
+     */
+    fun hasModality(modality: ModalityType): Boolean {
+        return modality() == modality
     }
 }
