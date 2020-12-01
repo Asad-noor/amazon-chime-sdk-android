@@ -16,6 +16,7 @@ enum class ContentShareStatusCode {
 
     /**
      * Content share video connection is in an unrecoverable failed state.
+     * May be recovered by restart the content share connection.
      */
     VideoServiceFailed;
 }

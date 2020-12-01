@@ -135,7 +135,7 @@ class DefaultMeetingSession(
             )
 
         val contentShareConfiguration =
-            DefaultContentShareController.createContentShareMeetingSessionConfiguration(configuration)
+            configuration.createContentShareMeetingSessionConfiguration()
 
         val contentShareTurnRequestParams =
             TURNRequestParams(

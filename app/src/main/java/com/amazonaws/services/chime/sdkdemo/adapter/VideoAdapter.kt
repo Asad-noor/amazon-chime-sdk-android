@@ -54,7 +54,7 @@ class VideoAdapter(
                 videoRenderView.scalingType = VideoScalingType.AspectFit
             } else {
                 val width =
-                    if (isLandscapeMode(context) == true) displayMetrics.widthPixels / 2 else displayMetrics.widthPixels
+                    if (isLandscapeMode(context)) displayMetrics.widthPixels / 2 else displayMetrics.widthPixels
                 val height = (width * VIDEO_ASPECT_RATIO_16_9).toInt()
                 holder.tileContainer.layoutParams.height = height
                 holder.tileContainer.layoutParams.width = width

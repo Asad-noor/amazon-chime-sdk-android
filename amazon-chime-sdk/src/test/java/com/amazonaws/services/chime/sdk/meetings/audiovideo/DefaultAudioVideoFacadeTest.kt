@@ -263,8 +263,9 @@ class DefaultAudioVideoFacadeTest {
     }
 
     @Test
-    fun `startContentShare should call contentShareController startConTentShare`() {
+    fun `startContentShare should call contentShareController startContentShare`() {
         val source = mockkClass(ContentShareSource::class)
+
         audioVideoFacade.startContentShare(source)
 
         verify { contentShareController.startContentShare(source) }

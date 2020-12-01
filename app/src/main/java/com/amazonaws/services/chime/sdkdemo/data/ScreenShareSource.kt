@@ -15,7 +15,7 @@ import com.amazonaws.services.chime.sdkdemo.service.ScreenCaptureService
 
 class ScreenShareSource(
     videoCaptureSource: DefaultScreenCaptureSource,
-    private val context: Context? = null
+    private val context: Context
 ) : ContentShareSource() {
     override var videoSource: VideoSource? = videoCaptureSource
 
@@ -27,7 +27,7 @@ class ScreenShareSource(
 
     fun stop() {
         videoSource?.let {
-            context?.stopService(Intent(context, ScreenCaptureService::class.java))
+            context.stopService(Intent(context, ScreenCaptureService::class.java))
             (it as DefaultScreenCaptureSource).stop()
         }
     }

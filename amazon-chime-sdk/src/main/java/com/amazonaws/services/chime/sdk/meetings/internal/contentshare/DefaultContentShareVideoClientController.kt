@@ -8,6 +8,8 @@ package com.amazonaws.services.chime.sdk.meetings.internal.contentshare
 import android.content.Context
 import com.amazonaws.services.chime.sdk.BuildConfig
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareObserver
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareStatus
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareStatusCode
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSource
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCore
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFactory
@@ -35,13 +37,13 @@ class DefaultContentShareVideoClientController(
     private val TAG = "DefaultContentShareVideoClientController"
 
     private val VIDEO_CLIENT_FLAG_ENABLE_USE_HW_DECODE_AND_RENDER = 1 shl 6
-    private val VIDEO_CLIENT_FLAG_ENABLE_TWO_SIMULCAST_STREAMS = 1 shl 12
     private val VIDEO_CLIENT_FLAG_DISABLE_CAPTURER = 1 shl 20
+    private val VIDEO_CLIENT_FLAG_IS_CONTENT_SHARE = 1 shl 23
 
-    override fun startVideoSharing(videoSource: VideoSource) {
+    override fun startVideoShare(videoSource: VideoSource) {
         // Stop sharing the current source
         if (isSharing) {
-            stopVideoSharing()
+            stopVideoShare()
         }
 
         // Start the given content share source
@@ -53,7 +55,17 @@ class DefaultContentShareVideoClientController(
         if (videoClient == null) {
             initializeVideoClient()
         }
-        startVideoClient()
+
+        if (!startVideoClient()) {
+            ObserverUtils.notifyObserverOnMainThread(observers) {
+                it.onContentShareStopped(
+                    ContentShareStatus(
+                        ContentShareStatusCode.VideoServiceFailed
+                    )
+                )
+            }
+            return
+        }
 
         logger.debug(TAG, "Setting external video source to content share source")
         videoSourceAdapter.source = videoSource
@@ -67,7 +79,7 @@ class DefaultContentShareVideoClientController(
     }
 
     private fun initializeVideoClient() {
-        logger.info(TAG, "Initializing video client")
+        logger.info(TAG, "Initializing content share video client")
         initializeAppDetailedInfo()
         // Thread safe operation
         VideoClient.initializeGlobals(context)
@@ -98,12 +110,12 @@ class DefaultContentShareVideoClientController(
         )
     }
 
-    private fun startVideoClient() {
+    private fun startVideoClient(): Boolean {
         logger.info(TAG, "Starting content share video client for content share")
         var flag = 0
         flag = flag or VIDEO_CLIENT_FLAG_ENABLE_USE_HW_DECODE_AND_RENDER
-        flag = flag or VIDEO_CLIENT_FLAG_ENABLE_TWO_SIMULCAST_STREAMS
         flag = flag or VIDEO_CLIENT_FLAG_DISABLE_CAPTURER
+        flag = flag or VIDEO_CLIENT_FLAG_IS_CONTENT_SHARE
         val result = videoClient?.startServiceV3(
             "",
             "",
@@ -113,11 +125,12 @@ class DefaultContentShareVideoClientController(
             0,
             flag,
             eglCore?.eglContext
-        )
+        ) ?: false
         logger.info(TAG, "Content share video client start result: $result")
+        return result
     }
 
-    override fun stopVideoSharing() {
+    override fun stopVideoShare() {
         logger.info(TAG, "Stopping content share video client")
         videoClient?.stopService()
         videoClient?.destroy()

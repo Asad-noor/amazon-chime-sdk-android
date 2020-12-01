@@ -204,7 +204,7 @@ class DefaultVideoClientController(
             eglCore?.eglContext
         )
 
-        videoSourceAdapter?.let { videoClient?.setExternalVideoSource(it, eglCore?.eglContext) }
+        videoSourceAdapter.let { videoClient?.setExternalVideoSource(it, eglCore?.eglContext) }
     }
 
     override fun stopVideoClient() {

@@ -9,9 +9,9 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.Content
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSource
 
 interface ContentShareVideoClientController {
-    fun startVideoSharing(videoSource: VideoSource)
+    fun startVideoShare(videoSource: VideoSource)
 
-    fun stopVideoSharing()
+    fun stopVideoShare()
 
     fun subscribeToVideoClientStateChange(observer: ContentShareObserver)
 

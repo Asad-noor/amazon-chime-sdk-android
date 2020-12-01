@@ -20,8 +20,9 @@ interface ContentShareObserver {
     /**
      * Called when the content share has stopped with the reason provided in the status.
      * The content is not shared with other attendees anymore.
-     * If you no longer need to share the source, stop the source when this callback is called.
-     * This callback will be on the main thread.
+     *
+     * If you no longer need the source producing frames,
+     * most builders can stop the source after this callback is invoked.
      *
      * @param status: [ContentShareStatus] - the reason why the content share has stopped
      */

@@ -49,7 +49,7 @@ class DefaultScreenCaptureSource(
     private val TAG = "DefaultScreenCaptureSource"
 
     init {
-        val thread = HandlerThread("DefaultScreenCaptureSource")
+        val thread = HandlerThread(TAG)
         thread.start()
         handler = Handler(thread.looper)
     }

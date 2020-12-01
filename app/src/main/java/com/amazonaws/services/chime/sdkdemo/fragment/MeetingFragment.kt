@@ -356,7 +356,7 @@ class MeetingFragment : Fragment(),
     }
 
     private fun createLinearLayoutManagerForOrientation(): LinearLayoutManager {
-        return if (isLandscapeMode(activity) == true) {
+        return if (isLandscapeMode(activity)) {
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         } else {
             LinearLayoutManager(activity)
@@ -762,7 +762,6 @@ class MeetingFragment : Fragment(),
     }
 
     private fun toggleScreenCapture() {
-        logger.info("linsang", "isSharing: ${meetingModel.isSharingContent}")
         if (meetingModel.isSharingContent) {
             audioVideo.stopContentShare()
         } else {
@@ -857,13 +856,13 @@ class MeetingFragment : Fragment(),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                data?.let { startScreenShare(resultCode, it) }
+                data?.let { startScreenShare(resultCode, it, requireContext()) }
             }
         }
     }
 
-    private fun startScreenShare(resultCode: Int, data: Intent) {
-        context?.startService(Intent(context, ScreenCaptureService::class.java))
+    private fun startScreenShare(resultCode: Int, data: Intent, fragmentContext: Context) {
+        fragmentContext.startService(Intent(fragmentContext, ScreenCaptureService::class.java))
 
         val mediaProjection = mediaProjectionManager.getMediaProjection(
             resultCode,
@@ -872,7 +871,7 @@ class MeetingFragment : Fragment(),
 
         mediaProjection?.let {
             val screenCaptureSource = DefaultScreenCaptureSource(
-                context!!,
+                fragmentContext,
                 logger,
                 DefaultSurfaceTextureCaptureSourceFactory(
                     logger,
@@ -884,7 +883,8 @@ class MeetingFragment : Fragment(),
             val screenCaptureSourceObserver = object : CaptureSourceObserver {
                 override fun onCaptureStarted() {
                     screenShareSource?.let { source ->
-                        audioVideo.startContentShare(source) }
+                        audioVideo.startContentShare(source)
+                    }
                 }
 
                 override fun onCaptureStopped() {
@@ -897,7 +897,7 @@ class MeetingFragment : Fragment(),
                 }
             }
 
-            screenShareSource = ScreenShareSource(screenCaptureSource, context)
+            screenShareSource = ScreenShareSource(screenCaptureSource, fragmentContext)
             screenShareSource?.addObserver(screenCaptureSourceObserver)
             screenShareSource?.start()
             (activity as MeetingActivity).setScreenShareSource(screenShareSource)
