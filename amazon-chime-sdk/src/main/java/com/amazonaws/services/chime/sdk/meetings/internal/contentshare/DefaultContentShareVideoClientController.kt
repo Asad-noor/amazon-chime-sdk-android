@@ -37,8 +37,8 @@ class DefaultContentShareVideoClientController(
     private val TAG = "DefaultContentShareVideoClientController"
 
     private val VIDEO_CLIENT_FLAG_ENABLE_USE_HW_DECODE_AND_RENDER = 1 shl 6
+    private val VIDEO_CLIENT_FLAG_ENABLE_TWO_SIMULCAST_STREAMS = 1 shl 12
     private val VIDEO_CLIENT_FLAG_DISABLE_CAPTURER = 1 shl 20
-    private val VIDEO_CLIENT_FLAG_IS_CONTENT_SHARE = 1 shl 23
 
     override fun startVideoShare(videoSource: VideoSource) {
         // Stop sharing the current source
@@ -72,9 +72,6 @@ class DefaultContentShareVideoClientController(
         videoClient?.setExternalVideoSource(videoSourceAdapter, eglCore?.eglContext)
         logger.debug(TAG, "Setting sending to true")
         videoClient?.setSending(true)
-        ObserverUtils.notifyObserverOnMainThread(observers) {
-            it.onContentShareStarted()
-        }
         isSharing = true
     }
 
@@ -114,8 +111,8 @@ class DefaultContentShareVideoClientController(
         logger.info(TAG, "Starting content share video client for content share")
         var flag = 0
         flag = flag or VIDEO_CLIENT_FLAG_ENABLE_USE_HW_DECODE_AND_RENDER
+        flag = flag or VIDEO_CLIENT_FLAG_ENABLE_TWO_SIMULCAST_STREAMS
         flag = flag or VIDEO_CLIENT_FLAG_DISABLE_CAPTURER
-        flag = flag or VIDEO_CLIENT_FLAG_IS_CONTENT_SHARE
         val result = videoClient?.startServiceV3(
             "",
             "",

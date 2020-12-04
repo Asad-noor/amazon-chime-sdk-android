@@ -15,7 +15,6 @@ import android.media.AudioManager
 import android.os.HandlerThread
 import android.os.Looper
 import android.util.Log
-import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.DefaultContentShareController
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFactory
 import com.amazonaws.services.chime.sdk.meetings.internal.audio.AudioClientFactory
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
@@ -67,12 +66,6 @@ class DefaultMeetingSessionTest {
         every { System.loadLibrary(any()) } just runs
         every { Log.d(any(), any()) } returns 0
         MockKAnnotations.init(this, relaxed = true)
-        mockkObject(DefaultContentShareController.Companion)
-        every {
-            DefaultContentShareController.createContentShareMeetingSessionConfiguration(
-                configuration
-            )
-        } returns contentConfiguration
         every { context.assets } returns assetManager
         every { context.registerReceiver(any(), any()) } returns mockkClass(Intent::class)
         val audioManager = mockkClass(AudioManager::class)
@@ -91,6 +84,7 @@ class DefaultMeetingSessionTest {
         mockkObject(AudioClientFactory.Companion)
         every { AudioClientFactory.getAudioClient(any(), any()) } returns mockAudioClient
         every { logger.info(any(), any()) } just runs
+        every { configuration.createContentShareMeetingSessionConfiguration() } returns contentConfiguration
 
         mockkConstructor(HandlerThread::class)
         every { anyConstructed<HandlerThread>().looper } returns mockLooper

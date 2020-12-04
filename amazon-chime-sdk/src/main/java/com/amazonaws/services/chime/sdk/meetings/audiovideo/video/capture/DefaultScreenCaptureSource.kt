@@ -111,6 +111,7 @@ class DefaultScreenCaptureSource(
             surfaceTextureSource?.release()
             surfaceTextureSource = null
         }
+        isCapturing = false
     }
 
     override fun addCaptureSourceObserver(observer: CaptureSourceObserver) {

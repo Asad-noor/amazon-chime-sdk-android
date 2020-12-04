@@ -6,7 +6,9 @@
 package com.amazonaws.services.chime.sdk.meetings.internal.video
 
 import com.xodee.client.video.VideoClient
+import com.xodee.client.video.VideoClientDataMessageListener
 import com.xodee.client.video.VideoClientDelegate
+import com.xodee.client.video.VideoClientLogListener
 
 class DefaultVideoClientFactory : VideoClientFactory {
     override fun getVideoClient(videoClientObserver: VideoClientObserver): VideoClient {
@@ -14,6 +16,10 @@ class DefaultVideoClientFactory : VideoClientFactory {
     }
 
     override fun getVideoClient(videoClientDelegate: VideoClientDelegate): VideoClient {
-        return VideoClient(videoClientDelegate, null, null)
+        return VideoClient(
+            videoClientDelegate,
+            VideoClientLogListener { _, _ -> Unit },
+            VideoClientDataMessageListener { Unit }
+        )
     }
 }

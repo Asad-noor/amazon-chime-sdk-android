@@ -764,6 +764,7 @@ class MeetingFragment : Fragment(),
     private fun toggleScreenCapture() {
         if (meetingModel.isSharingContent) {
             audioVideo.stopContentShare()
+            screenShareSource?.stop()
         } else {
             startActivityForResult(
                 mediaProjectionManager.createScreenCaptureIntent(),
@@ -919,7 +920,6 @@ class MeetingFragment : Fragment(),
             "$status"
         )
         meetingModel.isSharingContent = false
-        screenShareSource?.stop()
     }
 
     private fun showVideoTile(tileState: VideoTileState) {
@@ -1055,6 +1055,7 @@ class MeetingFragment : Fragment(),
                 // Show the latest content share
                 if (meetingModel.isSharingContent && !tileState.isLocalTile) {
                     audioVideo.stopContentShare()
+                    screenShareSource?.stop()
                     notifyHandler("${meetingModel.currentRoster[tileState.attendeeId]?.attendeeName ?: ""} took over the screen share")
                 }
                 showVideoTile(tileState)

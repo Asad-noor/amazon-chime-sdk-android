@@ -44,6 +44,9 @@ class DefaultContentShareVideoClientObserver(
 
     override fun didConnect(client: VideoClient?, controlStatus: Int) {
         logger.debug(TAG, "content share video client is connected")
+        ObserverUtils.notifyObserverOnMainThread(contentShareObservers) {
+            it.onContentShareStarted()
+        }
     }
 
     override fun didFail(client: VideoClient?, status: Int, controlStatus: Int) {
