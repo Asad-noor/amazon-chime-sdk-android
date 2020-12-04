@@ -18,7 +18,7 @@ import kotlin.math.min
 // This will be used for keeping state after rotation
 class MeetingModel : ViewModel() {
     val localTileId = 0
-    private val videoTileCountPerPage = 4
+    private val videoTileCountPerPage = 32
 
     val currentMetrics = mutableMapOf<String, MetricData>()
     val currentRoster = mutableMapOf<String, RosterAttendee>()
