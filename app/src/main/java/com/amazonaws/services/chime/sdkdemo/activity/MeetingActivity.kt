@@ -110,6 +110,13 @@ class MeetingActivity : AppCompatActivity(),
         onBackPressed()
     }
 
+    override fun onDestroy() {
+        if (isFinishing) {
+            onLeaveMeeting()
+        }
+        super.onDestroy()
+    }
+
     override fun onBackPressed() {
         meetingSessionModel.audioVideo.stopContentShare()
         meetingSessionModel.audioVideo.stop()
