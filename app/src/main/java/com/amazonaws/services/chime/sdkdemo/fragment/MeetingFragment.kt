@@ -402,7 +402,6 @@ class MeetingFragment : Fragment(),
             dialog.dismiss()
             meetingModel.isAdditionalOptionsDialogOn = false
         }
-        refreshAdditionalOptionsDialogItems()
         additionalOptionsAlertDialogBuilder.setOnDismissListener {
             meetingModel.isAdditionalOptionsDialogOn = false
         }
@@ -416,22 +415,22 @@ class MeetingFragment : Fragment(),
         val isVoiceFocusEnabled = audioVideo.realtimeIsVoiceFocusEnabled()
 
         val additionalToggles = arrayOf(
+            context?.getString(if (meetingModel.isSharingContent) R.string.disable_screen_capture_source else R.string.enable_screen_capture_source),
             context?.getString(if (isVoiceFocusEnabled) R.string.disable_voice_focus else R.string.enable_voice_focus),
-            context?.getString(R.string.toggle_flashlight),
-            context?.getString(R.string.toggle_cpu_filter),
-            context?.getString(R.string.toggle_gpu_filter),
-            context?.getString(R.string.toggle_custom_capture_source),
-            context?.getString(R.string.toggle_screen_capture_source)
+            context?.getString(if (cameraCaptureSource.torchEnabled) R.string.disable_flashlight else R.string.enable_flashlight),
+            context?.getString(if (meetingModel.isUsingCpuVideoProcessor) R.string.disable_cpu_filter else R.string.enable_cpu_filter),
+            context?.getString(if (meetingModel.isUsingGpuVideoProcessor) R.string.disable_gpu_filter else R.string.enable_gpu_filter),
+            context?.getString(if (meetingModel.isUsingCameraCaptureSource) R.string.disable_custom_capture_source else R.string.enable_custom_capture_source)
         )
 
         additionalOptionsAlertDialogBuilder.setItems(additionalToggles) { _, which ->
             when (which) {
-                0 -> setVoiceFocusEnabled(!isVoiceFocusEnabled)
-                1 -> toggleFlashlight()
-                2 -> toggleCpuDemoFilter()
-                3 -> toggleGpuDemoFilter()
-                4 -> toggleCustomCaptureSource()
-                5 -> toggleScreenCapture()
+                0 -> toggleScreenCapture()
+                1 -> setVoiceFocusEnabled(!isVoiceFocusEnabled)
+                2 -> toggleFlashlight()
+                3 -> toggleCpuDemoFilter()
+                4 -> toggleGpuDemoFilter()
+                5 -> toggleCustomCaptureSource()
             }
         }
     }
@@ -639,7 +638,6 @@ class MeetingFragment : Fragment(),
 
         if (success) {
             notifyHandler("Voice Focus ${action}d")
-            refreshAdditionalOptionsDialogItems()
         } else {
             notifyHandler("Failed to $action Voice Focus")
         }
@@ -656,6 +654,7 @@ class MeetingFragment : Fragment(),
     }
 
     private fun toggleAdditionalOptionsMenu() {
+        refreshAdditionalOptionsDialogItems()
         additionalOptionsAlertDialogBuilder.create()
         additionalOptionsAlertDialogBuilder.show()
         meetingModel.isAdditionalOptionsDialogOn = true

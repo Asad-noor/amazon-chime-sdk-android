@@ -22,8 +22,6 @@
     <string name="video_view">Video Collection</string>
     <string name="no_screen_share_available">No screen share available</string>
     <string name="no_videos_available">No videos available</string>
-    <string name="enable_voice_focus">Turn on Voice Focus</string>
-    <string name="disable_voice_focus">Turn off Voice Focus</string>
 
     <!-- device selection -->
     <string name="device_management_title">Select devices</string>
@@ -42,12 +40,19 @@
     <!-- toggle tab -->
     <string name="toggle_camera">Toggle Camera</string>
     <string name="toggle_additional_options_menu">Toggle Additional Options Menu</string>
-    <string name="toggle_flashlight">Toggle flashlight on current camera</string>
-    <string name="toggle_cpu_filter">Toggle demo filter (CPU)</string>
-    <string name="toggle_gpu_filter">Toggle demo filter (GPU)</string>
-    <string name="toggle_custom_capture_source">Toggle using custom capture source</string>
-    <string name="toggle_screen_capture_source">Toggle screen capture</string>
     <string name="toggle_mute">Toggle Mute</string>
+    <string name="enable_screen_capture_source">Share screen</string>
+    <string name="disable_screen_capture_source">Stop sharing screen</string>
+    <string name="enable_voice_focus">Turn on Voice Focus (noise suppression)</string>
+    <string name="disable_voice_focus">Turn off Voice Focus (noise suppression)</string>
+    <string name="enable_flashlight">Turn on flashlight</string>
+    <string name="disable_flashlight">Turn off flashlight</string>
+    <string name="enable_cpu_filter">Turn on demo filter (CPU)</string>
+    <string name="disable_cpu_filter">Turn off demo filter (CPU)</string>
+    <string name="enable_gpu_filter">Turn on demo filter (GPU)</string>
+    <string name="disable_gpu_filter">Turn off demo filter (GPU)</string>
+    <string name="enable_custom_capture_source">Turn on custom capture source</string>
+    <string name="disable_custom_capture_source">Turn off custom capture source</string>
 
     <!-- Alert -->
     <string name="cancel">Cancel</string>
@@ -55,7 +60,7 @@
     <string name="alert_title_additional_options">Additional Options</string>
 
     <!-- Service -->
-    <string name="screen_capture_notification_tile">Screen Share</string>
+    <string name="screen_capture_notification_tile">Screen Sharing</string>
     <string name="screen_capture_notification_text">Your screen is being shared.</string>
 
     <!-- Notify users for errors -->
