@@ -5,6 +5,8 @@
 
 package com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare
 
+import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSource
+
 /**
  * [ContentShareController] exposes methods for starting and stopping content share with a [ContentShareSource].
  * The content represents a media steam to be shared in the meeting, such as screen capture or
@@ -30,6 +32,8 @@ interface ContentShareController {
      *
      * Once the sharing stops successfully, [ContentShareObserver.onContentShareStopped]
      * will be invoked with status code [ContentShareStatusCode.OK].
+     *
+     * This will call [VideoSource.removeVideoSink] on any previously provided video source.
      */
     fun stopContentShare()
 
