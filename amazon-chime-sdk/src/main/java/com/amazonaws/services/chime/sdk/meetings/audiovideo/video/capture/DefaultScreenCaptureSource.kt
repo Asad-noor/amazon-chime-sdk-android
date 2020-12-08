@@ -13,6 +13,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.DisplayMetrics
 import android.view.Display
+import android.view.Surface
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoContentHint
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoFrame
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSink
@@ -21,6 +22,13 @@ import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 
+/**
+ * [DefaultScreenCaptureSource] uses [MediaProjection] that create a [virtualDisplay] to capture the
+ * device screen. It will render the captured frames to a [Surface] provided by a [SurfaceTextureCaptureSourceFactory].
+ *
+ * Builders should get permission from users to obtain the [MediaProjection] instance, for which this class
+ * will call start and stop internally.
+ */
 class DefaultScreenCaptureSource(
     private val context: Context,
     private val logger: Logger,

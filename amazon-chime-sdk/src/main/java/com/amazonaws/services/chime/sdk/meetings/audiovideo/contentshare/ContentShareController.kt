@@ -6,7 +6,7 @@
 package com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare
 
 /**
- * [ContentShareController] exposes methods for starting and stopping content share with a source.
+ * [ContentShareController] exposes methods for starting and stopping content share with a [ContentShareSource].
  * The content represents a media steam to be shared in the meeting, such as screen capture or
  * media files.
  */

@@ -6,13 +6,13 @@
 package com.amazonaws.services.chime.sdk.meetings.internal.contentshare
 
 import android.content.Context
-import com.amazonaws.services.chime.sdk.BuildConfig
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareObserver
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareStatus
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.contentshare.ContentShareStatusCode
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSource
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCore
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFactory
+import com.amazonaws.services.chime.sdk.meetings.internal.utils.AppInfoUtil
 import com.amazonaws.services.chime.sdk.meetings.internal.utils.ObserverUtils
 import com.amazonaws.services.chime.sdk.meetings.internal.video.VideoClientFactory
 import com.amazonaws.services.chime.sdk.meetings.internal.video.VideoSourceAdapter
@@ -77,34 +77,12 @@ class DefaultContentShareVideoClientController(
 
     private fun initializeVideoClient() {
         logger.info(TAG, "Initializing content share video client")
-        initializeAppDetailedInfo()
-        // Thread safe operation
+        AppInfoUtil.initializeVideoClientAppDetailedInfo(context)
+        // Thread safe operation, can be called multiple times
         VideoClient.initializeGlobals(context)
         videoClient = videoClientFactory.getVideoClient(contentShareVideoClientObserver)
         // Content share is send only
         videoClient?.setReceiving(false)
-    }
-
-    private fun initializeAppDetailedInfo() {
-        val manufacturer = android.os.Build.MANUFACTURER
-        val model = android.os.Build.MODEL
-        val osVersion = android.os.Build.VERSION.RELEASE
-        val packageName = context.packageName
-        val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
-        val appVer = packageInfo.versionName
-        val appCode = packageInfo.versionCode.toString()
-        val clientSource = "amazon-chime-sdk"
-        val sdkVersion = BuildConfig.VERSION_NAME
-
-        VideoClient.AppDetailedInfo.initialize(
-            String.format("Android %s", appVer),
-            appCode,
-            model,
-            manufacturer,
-            osVersion,
-            clientSource,
-            sdkVersion
-        )
     }
 
     private fun startVideoClient(): Boolean {

@@ -6,7 +6,6 @@
 package com.amazonaws.services.chime.sdk.meetings.internal.video
 
 import android.content.Context
-import com.amazonaws.services.chime.sdk.BuildConfig
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoSource
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.CameraCaptureSource
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.DefaultCameraCaptureSource
@@ -14,6 +13,7 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.Defaul
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCore
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.gl.EglCoreFactory
 import com.amazonaws.services.chime.sdk.meetings.device.MediaDevice
+import com.amazonaws.services.chime.sdk.meetings.internal.utils.AppInfoUtil
 import com.amazonaws.services.chime.sdk.meetings.session.MeetingSessionConfiguration
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.Logger
 import com.google.gson.Gson
@@ -180,7 +180,7 @@ class DefaultVideoClientController(
 
     override fun initializeVideoClient() {
         logger.info(TAG, "Initializing video client")
-        initializeAppDetailedInfo()
+        AppInfoUtil.initializeVideoClientAppDetailedInfo(context)
         VideoClient.initializeGlobals(context)
         VideoClientCapturer.getInstance(context)
         videoClient = videoClientFactory.getVideoClient(videoClientObserver)
@@ -217,27 +217,5 @@ class DefaultVideoClientController(
         videoClient?.destroy()
         videoClient = null
         VideoClient.finalizeGlobals()
-    }
-
-    private fun initializeAppDetailedInfo() {
-        val manufacturer = android.os.Build.MANUFACTURER
-        val model = android.os.Build.MODEL
-        val osVersion = android.os.Build.VERSION.RELEASE
-        val packageName = context.packageName
-        val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
-        val appVer = packageInfo.versionName
-        val appCode = packageInfo.versionCode.toString()
-        val clientSource = "amazon-chime-sdk"
-        val sdkVersion = BuildConfig.VERSION_NAME
-
-        VideoClient.AppDetailedInfo.initialize(
-            String.format("Android %s", appVer),
-            appCode,
-            model,
-            manufacturer,
-            osVersion,
-            clientSource,
-            sdkVersion
-        )
     }
 }

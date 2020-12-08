@@ -14,40 +14,29 @@ import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.capture.Defaul
 import com.amazonaws.services.chime.sdkdemo.service.ScreenCaptureService
 
 class ScreenShareSource(
-    videoCaptureSource: DefaultScreenCaptureSource,
+    private val screenCaptureSource: DefaultScreenCaptureSource,
     private val context: Context
 ) : ContentShareSource() {
-    override var videoSource: VideoSource? = videoCaptureSource
+    override var videoSource: VideoSource? = screenCaptureSource
 
     fun start() {
-        videoSource?.let {
-            (it as DefaultScreenCaptureSource).start()
-        }
+        screenCaptureSource.start()
     }
 
     fun stop() {
-        videoSource?.let {
-            context.stopService(Intent(context, ScreenCaptureService::class.java))
-            (it as DefaultScreenCaptureSource).stop()
-        }
+        context.stopService(Intent(context, ScreenCaptureService::class.java))
+        screenCaptureSource.stop()
     }
 
     fun release() {
-        videoSource?.let {
-            (it as DefaultScreenCaptureSource).release()
-            videoSource = null
-        }
+        screenCaptureSource.release()
     }
 
     fun addObserver(observer: CaptureSourceObserver) {
-        videoSource?.let {
-            (it as DefaultScreenCaptureSource).addCaptureSourceObserver(observer)
-        }
+        screenCaptureSource.addCaptureSourceObserver(observer)
     }
 
     fun removeObserver(observer: CaptureSourceObserver) {
-        videoSource?.let {
-            (it as DefaultScreenCaptureSource).removeCaptureSourceObserver(observer)
-        }
+        screenCaptureSource.removeCaptureSourceObserver(observer)
     }
 }

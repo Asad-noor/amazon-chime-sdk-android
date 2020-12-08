@@ -110,15 +110,15 @@ class DefaultContentShareVideoClientObserver(
     }
 
     override fun onCameraChanged() {
-        // No implementation
+        // No implementation since we don't use default camera for content share
     }
 
     override fun onMetrics(metrics: IntArray?, values: DoubleArray?) {
-        // No implementation
+        // No implementation since we don't provide metrics for content share for now
     }
 
-    override fun cameraSendIsAvailable(p0: VideoClient?, p1: Boolean) {
-        // No implementation
+    override fun cameraSendIsAvailable(client: VideoClient?, available: Boolean) {
+        // No implementation since we don't use default camera for content share
     }
 
     override fun didReceiveFrame(
@@ -129,10 +129,10 @@ class DefaultContentShareVideoClientObserver(
         pauseType: Int,
         videoId: Int
     ) {
-        // No implementation
+        // No implementation since content share is send only and we don't use this path for local rendering
     }
 
     override fun pauseRemoteVideo(client: VideoClient?, display_id: Int, pause: Boolean) {
-        // No implementation
+        // No implementation since content share is send only and we don't get any remote video
     }
 }

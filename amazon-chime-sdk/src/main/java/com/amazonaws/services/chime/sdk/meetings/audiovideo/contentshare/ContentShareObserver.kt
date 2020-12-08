@@ -18,8 +18,8 @@ interface ContentShareObserver {
     fun onContentShareStarted()
 
     /**
-     * Called when the content share has stopped with the reason provided in the status.
-     * The content is not shared with other attendees anymore.
+     * Called when the content is no longer shared with other attendees
+     * with the reason provided in the status.
      *
      * If you no longer need the source producing frames,
      * most builders can stop the source after this callback is invoked.
