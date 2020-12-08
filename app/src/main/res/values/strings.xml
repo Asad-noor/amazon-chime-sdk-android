@@ -22,6 +22,8 @@
     <string name="video_view">Video Collection</string>
     <string name="no_screen_share_available">No screen share available</string>
     <string name="no_videos_available">No videos available</string>
+    <string name="next_video_page">Next Page &gt;&gt;</string>
+    <string name="prev_video_page">&lt;&lt; Prev Page</string>
 
     <!-- device selection -->
     <string name="device_management_title">Select devices</string>
