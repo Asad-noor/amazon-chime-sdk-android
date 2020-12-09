@@ -112,12 +112,12 @@ class MeetingActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         if (isFinishing) {
-            onLeaveMeeting()
+            cleanup()
         }
         super.onDestroy()
     }
 
-    override fun onBackPressed() {
+    private fun cleanup() {
         meetingSessionModel.audioVideo.stopLocalVideo()
         meetingSessionModel.audioVideo.stopRemoteVideo()
         meetingSessionModel.audioVideo.stopContentShare()
@@ -127,7 +127,6 @@ class MeetingActivity : AppCompatActivity(),
         meetingSessionModel.cpuVideoProcessor.release()
         meetingSessionModel.screenShareSource?.stop()
         meetingSessionModel.screenShareSource?.release()
-        super.onBackPressed()
     }
 
     fun getAudioVideo(): AudioVideoFacade = meetingSessionModel.audioVideo

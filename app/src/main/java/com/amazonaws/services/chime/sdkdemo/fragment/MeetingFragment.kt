@@ -108,7 +108,6 @@ class MeetingFragment : Fragment(),
     private lateinit var listener: RosterViewEventListener
     override val scoreCallbackIntervalMs: Int? get() = 1000
 
-    private val ACTIVE_SCREEN_TILE_KEY = 0
     private val WEBRTC_PERMISSION_REQUEST_CODE = 1
     private val SCREEN_CAPTURE_REQUEST_CODE = 2
     private val TAG = "MeetingFragment"
@@ -1017,7 +1016,7 @@ class MeetingFragment : Fragment(),
     private fun showVideoTile(tileState: VideoTileState) {
         val videoCollectionTile = createVideoCollectionTile(tileState)
         if (tileState.isContent) {
-            meetingModel.currentScreenTiles[ACTIVE_SCREEN_TILE_KEY] = videoCollectionTile
+            meetingModel.currentScreenTiles.add(videoCollectionTile)
             screenTileAdapter.notifyDataSetChanged()
 
             // Currently not in the Screen tab, no need to render the video tile
@@ -1155,7 +1154,8 @@ class MeetingFragment : Fragment(),
                 if (meetingModel.isSharingContent && !tileState.isLocalTile) {
                     audioVideo.stopContentShare()
                     screenShareSource?.stop()
-                    notifyHandler("${meetingModel.currentRoster[tileState.attendeeId]?.attendeeName ?: ""} took over the screen share")
+                    val name = meetingModel.currentRoster[DefaultModality(tileState.attendeeId).base()]?.attendeeName ?: ""
+                    notifyHandler("$name took over the screen share")
                 }
                 showVideoTile(tileState)
             } else {
@@ -1179,7 +1179,7 @@ class MeetingFragment : Fragment(),
             )
             audioVideo.unbindVideoView(tileId)
             if (tileState.isContent) {
-                meetingModel.currentScreenTiles.removeAt(ACTIVE_SCREEN_TILE_KEY)
+                meetingModel.currentScreenTiles.removeAll { it.videoTileState.tileId == tileId }
                 screenTileAdapter.notifyDataSetChanged()
             } else {
                 if (meetingModel.localVideoTileState?.videoTileState?.tileId == tileId) {
@@ -1334,6 +1334,9 @@ class MeetingFragment : Fragment(),
             audioVideo.unbindVideoView(meetingModel.localTileId)
         }
         meetingModel.remoteVideoTileStates.forEach {
+            audioVideo.unbindVideoView(it.videoTileState.tileId)
+        }
+        meetingModel.currentScreenTiles.forEach {
             audioVideo.unbindVideoView(it.videoTileState.tileId)
         }
         listener.onLeaveMeeting()
