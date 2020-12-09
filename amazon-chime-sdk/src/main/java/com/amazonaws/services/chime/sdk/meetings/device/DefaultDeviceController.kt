@@ -148,9 +148,9 @@ class DefaultDeviceController(
         }
     }
 
-    override fun chooseAudioDevice(mediaDevice: MediaDevice) {
+    override fun chooseAudioDevice(mediaDevice: MediaDevice): Boolean {
         if (DefaultAudioClientController.audioClientState != AudioClientState.STARTED) {
-            return
+            return false
         }
         setupAudioDevice(mediaDevice.type)
         val route = when (mediaDevice.type) {
@@ -159,7 +159,7 @@ class DefaultDeviceController(
             MediaDeviceType.AUDIO_WIRED_HEADSET -> AudioClient.SPK_STREAM_ROUTE_HEADSET
             else -> AudioClient.SPK_STREAM_ROUTE_RECEIVER
         }
-        audioClientController.setRoute(route)
+        return audioClientController.setRoute(route)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)

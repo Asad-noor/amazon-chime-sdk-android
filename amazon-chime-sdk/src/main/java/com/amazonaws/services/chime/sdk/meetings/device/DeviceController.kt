@@ -30,8 +30,10 @@ interface DeviceController {
      * Note: [chooseAudioDevice] is no-op when audio client is not started.
      *
      * @param mediaDevice the audio device selected to use.
+     *
+     * @return whether [chooseAudioDevice] was successful
      */
-    fun chooseAudioDevice(mediaDevice: MediaDevice)
+    fun chooseAudioDevice(mediaDevice: MediaDevice): Boolean
 
     /**
      * Get the active input/output audio device in the meeting, return null if there isn't any.
